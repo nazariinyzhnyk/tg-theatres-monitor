@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tg-theatres-monitor"
+version = "0.0.1"
+authors = [{name="Nazarii Nyzhnyk", email = "nazar.nyzhnyk@gmail.com" }]
+description = "Service for monitoring theatres availability and notifying in Telegram groups"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["tg", "telegram", "bot", "events", "monitoring",]
+classifiers = ["Programming Language :: Python :: 3"]
+dependencies = [
+
+]
+
+[tool.pip-tools]
+header = false
+annotate = false
+emit-index-url = false
+verbose = true
+
+[tool.black]
+line-length = 119
+target-version = ['py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
