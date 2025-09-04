@@ -2,6 +2,9 @@
 
 version: '3'
 
+dotenv:
+  - '.env'
+
 vars:
   GREETING: Hello, World!
 
@@ -9,6 +12,12 @@ tasks:
   default:
     cmds:
       - echo "{{.GREETING}}"
+    silent: true
+
+  print-env:
+    cmds:
+      - echo "BOT_TOKEN=$BOT_TOKEN"
+      - echo "GROUP_ID=$GROUP_ID"
     silent: true
 
   prc:
