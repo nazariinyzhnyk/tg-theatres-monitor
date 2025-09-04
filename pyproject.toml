@@ -13,6 +13,7 @@ keywords = ["tg", "telegram", "bot", "events", "monitoring",]
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = [
     "bs4",
+    "lxml",
     "requests"
 ]
 

@@ -1,0 +1,12 @@
+general:
+  results_per_theatre: 10
+
+theatres:
+  - name: "Divadlo X10"
+    base_url: "https://www.divadlox10.cz/"
+    program_url: "https://www.divadlox10.cz/cs/program"
+    selectors:
+      elements: "div.performance-listed-main"
+      time: "time"
+      link: "h3.performance-listed-title a"
+    parse_delay: 5
