@@ -208,3 +208,6 @@ __marimo__/
 /local_ignored/
 
 */app.log
+
+.vscode/
+
