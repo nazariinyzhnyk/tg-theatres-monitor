@@ -24,3 +24,11 @@ tasks:
     cmds:
       - pre-commit run --all-files
     silent: true
+
+  build:
+    cmds:
+      - docker build -f Dockerfile -t theatres .
+
+  run:
+    cmds:
+      - docker run --env-file .env theatres

@@ -32,30 +32,32 @@ def parse_all(conf_file_path: str | None = None) -> dict:
 
     results = {}
     for theatre in cfg.get("theatres", []):
+        try:
+            theatre_name = theatre.get("name", "unknown_theatre")
+            base_url = theatre.get("base_url")
+            program_url = theatre.get("program_url")
+            selectors = theatre.get("selectors", {})
+            if not program_url or not selectors:
+                logger.warning(f"Skipping theatre '{theatre_name}' due to missing URL or selectors.")
+                continue
 
-        theatre_name = theatre.get("name", "unknown_theatre")
-        base_url = theatre.get("base_url")
-        program_url = theatre.get("program_url")
-        selectors = theatre.get("selectors", {})
-        if not program_url or not selectors:
-            logger.warning(f"Skipping theatre '{theatre_name}' due to missing URL or selectors.")
-            continue
+            logger.info(f"Parsing theatre: {theatre_name} from URL: {program_url}")
+            parsed_data = fetch_and_parse(
+                url=program_url,
+                elements_name=selectors["elements"],
+                time_tag_name=selectors["time"],
+                performance_link_name=selectors["link"],
+            )
 
-        logger.info(f"Parsing theatre: {theatre_name} from URL: {program_url}")
-        parsed_data = fetch_and_parse(
-            url=program_url,
-            elements_name=selectors["elements"],
-            time_tag_name=selectors["time"],
-            performance_link_name=selectors["link"],
-        )
+            parsed_data = parsed_data[: cfg["general"]["results_per_theatre"]]
+            for item in parsed_data:
+                if item["link"] and not item["link"].startswith("http"):
+                    item["link"] = base_url.rstrip("/") + "/" + item["link"].lstrip("/")
 
-        parsed_data = parsed_data[: cfg["general"]["results_per_theatre"]]
-        for item in parsed_data:
-            if item["link"] and not item["link"].startswith("http"):
-                item["link"] = base_url.rstrip("/") + "/" + item["link"].lstrip("/")
-
-        results[theatre_name] = parsed_data
-        logger.info(f"Successfully parsed data for theatre: {theatre_name}")
+            results[theatre_name] = parsed_data
+            logger.info(f"Successfully parsed data for theatre: {theatre_name}")
+        except Exception as e:
+            logger.error(f"Error parsing theatre '{theatre_name}': {e}")
 
     return results
 

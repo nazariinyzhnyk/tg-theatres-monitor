@@ -15,7 +15,8 @@ dependencies = [
     "bs4",
     "lxml",
     "requests",
-    "PyYAML"
+    "PyYAML",
+    "python-dotenv",
 ]
 
 [tool.pip-tools]
