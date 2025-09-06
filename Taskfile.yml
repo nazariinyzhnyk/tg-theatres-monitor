@@ -16,8 +16,8 @@ tasks:
 
   print-env:
     cmds:
-      - echo "BOT_TOKEN=$BOT_TOKEN"
-      - echo "GROUP_ID=$GROUP_ID"
+      - echo "BOT_ID=$BOT_ID"
+      - echo "CHAT_ID=$CHAT_ID"
     silent: true
 
   prc:
