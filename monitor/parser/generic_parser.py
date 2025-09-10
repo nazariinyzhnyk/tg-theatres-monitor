@@ -72,6 +72,7 @@ def fetch(
 def parse_performances(
     elements: ResultSet[Tag],
     time_tag_name: str,
+    performance_title_name: str,
     performance_link_name: str,
 ) -> list[dict]:
     """
@@ -83,6 +84,8 @@ def parse_performances(
         List of BeautifulSoup elements representing performances.
     time_tag_name: str
         CSS selector for the time tag.
+    performance_title_name: str
+        CSS selector for the performance title tag.
     performance_link_name
         CSS selector for the performance link tag.
 
@@ -96,9 +99,11 @@ def parse_performances(
         time_tag = perf.select_one(time_tag_name)
         datetime = time_tag["datetime"] if time_tag and time_tag.has_attr("datetime") else first_text(time_tag)
 
-        title_tag = perf.select_one(performance_link_name)
+        title_tag = perf.select_one(performance_title_name)
         title = first_text(title_tag)
-        link = title_tag["href"] if title_tag and title_tag.has_attr("href") else None
+
+        link_tag = perf.select_one(performance_link_name)
+        link = link_tag["href"] if link_tag and link_tag.has_attr("href") else None
 
         performances.append({"datetime": datetime, "title": title, "link": link})
 
@@ -109,6 +114,7 @@ def fetch_and_parse(
     url: str,
     elements_name: str,
     time_tag_name: str,
+    performance_title_name: str,
     performance_link_name: str,
 ) -> list[dict]:
     """
@@ -122,6 +128,8 @@ def fetch_and_parse(
         CSS selector for the performance elements.
     time_tag_name: str
         CSS selector for the time tag.
+    performance_title_name: str
+        CSS selector for the performance title tag.
     performance_link_name: str
         CSS selector for the performance link tag.
 
@@ -134,7 +142,10 @@ def fetch_and_parse(
     soup = fetch(url)
     elements = soup.select(elements_name)
     parsed_performances = parse_performances(
-        elements, time_tag_name=time_tag_name, performance_link_name=performance_link_name
+        elements,
+        time_tag_name=time_tag_name,
+        performance_title_name=performance_title_name,
+        performance_link_name=performance_link_name,
     )
 
     return parsed_performances

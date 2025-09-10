@@ -1,0 +1,24 @@
+general:
+  results_per_theatre: 10
+
+theatres:
+  - name: "Divadlo X10"
+    base_url: "https://www.divadlox10.cz/"
+    program_url: "https://www.divadlox10.cz/cs/program"
+    time_parseable: true
+    selectors:
+      elements: "div.performance-listed-main"
+      time: "time"
+      title: "h3.performance-listed-title a"
+      link: "h3.performance-listed-title a"
+    parse_delay: 5
+  - name: "Venuševe Švehlovce"
+    base_url: "https://www.venuse-ve-svehlovce.cz/"
+    program_url: "https://www.venuse-ve-svehlovce.cz/"
+    time_parseable: false
+    selectors:
+      elements: "div.program-single"
+      time: ".pr-footer .pr-price"
+      title: "h3"
+      link: ".pr-tex a"
+    parse_delay: 5

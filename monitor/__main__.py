@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from monitor.notifier import send_telegram_message
 from monitor.parser import parse_all
+from monitor.utils.load_cfg import load_yaml_config
 from monitor.utils.logger import logger
 
 load_dotenv()
@@ -24,7 +25,7 @@ def check_env_vars() -> None:
         raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 
-def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
+def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague", dt_parsable: bool = False) -> str:
     """
     Format theatre schedule into a Telegram-ready HTML string.
     Each play is bold, shows are sorted by date ascending,
@@ -33,6 +34,7 @@ def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
     Args:
         items (dict): List of shows with 'title', 'datetime', and 'link'.
         tz (str): Timezone for datetime conversion.
+        dt_parsable (bool): Whether the datetime strings are ISO 8601 parseable.
 
     Returns:
         str: Formatted HTML string.
@@ -40,7 +42,9 @@ def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
     parsed = []
     for it in items:
         title = " ".join(it["title"].split())
-        dt = datetime.fromisoformat(it["datetime"]).astimezone(ZoneInfo(tz))
+        dt = it["datetime"]
+        if dt_parsable:
+            dt = datetime.fromisoformat(it["datetime"]).astimezone(ZoneInfo(tz))
         parsed.append({"title": title, "dt": dt, "link": it["link"]})
 
     parsed.sort(key=lambda x: x["dt"])
@@ -55,7 +59,10 @@ def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
     for title, shows in grouped.items():
         lines.append(f"<b>{title}</b>")
         for s in shows:
-            date_str = s["dt"].strftime("%a, %d %b %H:%M")
+            date_str = s["dt"]
+            if dt_parsable:
+                date_str = date_str.strftime("%a, %d %b %H:%M")
+
             lines.append(f"- {date_str} → <a href=\"{s['link']}\">Detail</a>")
         lines.append("")
 
@@ -65,15 +72,18 @@ def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
 def main() -> None:
     check_env_vars()
 
+    cfg = load_yaml_config()
+
     logger.info("Start parsing theatres")
-    res = parse_all()
+    parsed_theatres_info = parse_all()
     logger.info("Finished parsing theatres")
 
-    for theatre_name, shows in res.items():
-        logger.info(f"Processing theatre: {theatre_name}")
-        message = format_theatre_schedule_html(shows)
-        message = f"<b>{theatre_name}</b>\n\n" + message
+    for theatre_name, shows in parsed_theatres_info.items():
+        theatre_config: dict = next((th for th in cfg["theatres"] if th["name"] == theatre_name), {})
 
+        logger.info(f"Processing theatre: {theatre_name}")
+        message = format_theatre_schedule_html(shows, dt_parsable=theatre_config.get("time_parseable", False))
+        message = f"<b>{theatre_name}</b>\n\n" + message
         send_telegram_message(os.environ["BOT_ID"], os.environ["CHAT_ID"], message)
 
 
