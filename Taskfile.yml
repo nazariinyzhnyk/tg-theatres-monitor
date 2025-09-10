@@ -32,3 +32,7 @@ tasks:
   run:
     cmds:
       - docker run --env-file .env theatres
+  
+  test:
+    cmds:
+      - python3 -m unittest discover -s tests
