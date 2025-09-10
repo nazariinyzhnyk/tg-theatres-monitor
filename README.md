@@ -23,7 +23,7 @@ run your bot once with:
 docker run --env-file .env theatres
 ```
 
-or configure a cronjob as: 
+or configure a cronjob as:
 ```
 * * * * * docker run --rm --env-file /absolute/path/to/.env theatres >> /path/to/logdir/tg_theatre.log
 ```

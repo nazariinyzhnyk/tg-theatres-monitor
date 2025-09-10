@@ -1,5 +1,5 @@
-from datetime import datetime
 import os
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
@@ -24,16 +24,16 @@ def check_env_vars() -> None:
         raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 
-def format_theatre_schedule_html(items: dict, tz="Europe/Prague") -> str:
+def format_theatre_schedule_html(items: dict, tz: str = "Europe/Prague") -> str:
     """
     Format theatre schedule into a Telegram-ready HTML string.
     Each play is bold, shows are sorted by date ascending,
     and links are proper <a href="">.
-    
+
     Args:
         items (dict): List of shows with 'title', 'datetime', and 'link'.
         tz (str): Timezone for datetime conversion.
-    
+
     Returns:
         str: Formatted HTML string.
     """
@@ -41,15 +41,11 @@ def format_theatre_schedule_html(items: dict, tz="Europe/Prague") -> str:
     for it in items:
         title = " ".join(it["title"].split())
         dt = datetime.fromisoformat(it["datetime"]).astimezone(ZoneInfo(tz))
-        parsed.append({
-            "title": title,
-            "dt": dt,
-            "link": it["link"]
-        })
+        parsed.append({"title": title, "dt": dt, "link": it["link"]})
 
     parsed.sort(key=lambda x: x["dt"])
 
-    grouped = {}
+    grouped: dict = {}
     for row in parsed:
         if row["title"] not in grouped:
             grouped[row["title"]] = []
@@ -73,17 +69,12 @@ def main() -> None:
     res = parse_all()
     logger.info("Finished parsing theatres")
 
-    
     for theatre_name, shows in res.items():
         logger.info(f"Processing theatre: {theatre_name}")
         message = format_theatre_schedule_html(shows)
         message = f"<b>{theatre_name}</b>\n\n" + message
 
-        send_telegram_message(
-            os.environ["BOT_ID"],
-            os.environ["CHAT_ID"],
-            message
-        )
+        send_telegram_message(os.environ["BOT_ID"], os.environ["CHAT_ID"], message)
 
 
 if __name__ == "__main__":
@@ -93,5 +84,5 @@ if __name__ == "__main__":
         logger.info("Monitoring script completed successfully.")
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-    
+
     logger.info("Monitoring script finished.")
