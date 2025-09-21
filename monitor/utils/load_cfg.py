@@ -3,12 +3,12 @@ from pathlib import Path
 import yaml
 
 
-def load_yaml_config(conf_file_path: str | None = None) -> dict:
+def load_yaml_config(conf_file_path: Path | None = None) -> dict:
     """
     Load configuration from a YAML file.
     Parameters
     ----------
-    conf_file_path: str | None
+    conf_file_path: Path | None
         Path to the configuration file. If None, defaults to 'theatres_cfg.yaml' in
         the current directory.
 
